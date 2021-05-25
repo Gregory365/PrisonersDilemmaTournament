@@ -85,7 +85,9 @@ def runFullPairingTournament(inFolder, outFile):
     print("Starting tournament, reading files from "+inFolder)
     scoreKeeper = {}
     STRATEGY_LIST = []
-    for file in os.listdir(inFolder):
+    current_folder = os.path.dirname(os.path.abspath(__file__))
+    absInFolder = os.path.join(current_folder, inFolder)
+    for file in os.listdir(absInFolder):
         if file.endswith(".py"):
             STRATEGY_LIST.append(file[:-3])
             
@@ -94,12 +96,14 @@ def runFullPairingTournament(inFolder, outFile):
         scoreKeeper[strategy] = 0
         
     f = open(outFile,"w+")
-    for pair in itertools.combinations(STRATEGY_LIST, r=2):
-        roundHistory = runRound(pair)
-        scoresA, scoresB = tallyRoundScores(roundHistory)
-        outputRoundResults(f, pair, roundHistory, scoresA, scoresB)
-        scoreKeeper[pair[0]] += scoresA
-        scoreKeeper[pair[1]] += scoresB
+    for i in range(10):
+        random.seed(i)
+        for pair in itertools.combinations(STRATEGY_LIST, r=2):
+            roundHistory = runRound(pair)
+            scoresA, scoresB = tallyRoundScores(roundHistory)
+            outputRoundResults(f, pair, roundHistory, scoresA, scoresB)
+            scoreKeeper[pair[0]] += scoresA
+            scoreKeeper[pair[1]] += scoresB
         
     scoresNumpy = np.zeros(len(scoreKeeper))
     for i in range(len(STRATEGY_LIST)):
